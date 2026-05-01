@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Can I Go Home Early</title>
+  <meta charset="UTF-8">
   <link rel="icon" type="image/png" href="image.png">
   <style>
     body {
@@ -72,6 +73,32 @@
 <body>
 
 <div class="card">
+  <div style="margin-bottom:15px;">
+  <button onclick="downloadExtension()">⬇ Download Extension</button>
+
+  <button style="background:#333; margin-top:8px;" onclick="showSteps()">
+    📘 How to Install
+  </button>
+
+  <div id="steps" style="display:none; font-size:12px; margin-top:10px; color:#aaa;">
+  1. Download ZIP<br>
+  2. Extract it<br>
+  3. Open 
+  <b onclick="openExtensions()" style="cursor:pointer; text-decoration:underline; color:#4caf50;">
+    chrome://extensions
+  </b><br>
+  <div id="copyMsg" style="display:none; color:#4caf50; font-size:12px; margin-top:5px;">
+  ✅ Copied! Paste in Chrome address bar (Ctrl + V)
+</div>
+  4. Enable <b>Developer Mode</b><br>
+  5. Click <b>Load Unpacked</b><br>
+  6. Select extracted folder<br><br>
+  ✅ Done!
+</div>
+   <div style="font-size:12px; margin-top:8px; color:#aaa;">
+    Extension auto-fetches your Keka hours ⚡
+  </div>
+</div>
 <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
   <img src="image.png" style="width:60px; height:60px;">
   <h2 style="margin:0;">Work Hours</h2>
@@ -102,6 +129,21 @@ function toMinutes(val) {
   if (!val || !val.includes(":")) return null;
   let [h, m] = val.split(":").map(Number);
   return h * 60 + m;
+}
+
+function downloadExtension() {
+  // 🔥 replace with your actual zip path
+  window.open("./extensions/keka-sync.zip", "_blank");
+}
+
+function showSteps() {
+  const el = document.getElementById("steps");
+  el.style.display = el.style.display === "none" ? "block" : "none";
+}
+
+function openExtensions() {
+  navigator.clipboard.writeText("chrome://extensions");
+  document.getElementById("copyMsg").style.display = "block";
 }
 
 function calc() {
