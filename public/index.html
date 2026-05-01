@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Can I Go Home Early</title>
+  <link rel="icon" type="image/png" href="gohome.png">
+  <style>
+    body {
+      font-family: Arial;
+      background: #121212;
+      color: white;
+      display: flex;
+      justify-content: center;
+      padding-top: 40px;
+    }
+
+    .card {
+      background: #1e1e1e;
+      padding: 25px;
+      border-radius: 12px;
+      width: 360px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      border-radius: 6px;
+      border: none;
+      font-size: 16px;
+      background: #2a2a2a;
+      color: white;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .row input {
+      width: 50%;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 12px;
+      background: #4caf50;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .output {
+      margin-top: 15px;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 16px;
+      white-space: pre-line;
+    }
+
+    .green { color: #4caf50; }
+    .red { color: #f44336; }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+<div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+  <img src="gohome.png" style="width:60px; height:60px;">
+  <h2 style="margin:0;">Work Hours</h2>
+</div>
+
+  <!-- 🔥 Adjustable Average -->
+  <label>Avg Hours per Day</label>
+  <div class="row">
+    <input id="avgH" type="number" value="8" min="0">
+    <input id="avgM" type="number" value="0" min="0" max="59">
+  </div>
+
+  <input id="mon" placeholder="Monday (9:42)">
+  <input id="tue" placeholder="Tuesday (8:07)">
+  <input id="wed" placeholder="Wednesday (9:47)">
+  <input id="thu" placeholder="Thursday (7:00)">
+  <input id="fri" placeholder="Friday (8:00)">
+
+  <button onclick="calc()">Calculate</button>
+
+  <div id="total" class="output"></div>
+  <div id="remaining" class="output"></div>
+  <div id="status" class="status"></div>
+</div>
+
+<script>
+function toMinutes(val) {
+  if (!val || !val.includes(":")) return null;
+  let [h, m] = val.split(":").map(Number);
+  return h * 60 + m;
+}
+
+function calc() {
+  const ids = ["mon","tue","wed","thu","fri"];
+  const values = ids.map(id => toMinutes(document.getElementById(id).value));
+
+  const totalDiv = document.getElementById("total");
+  const remainingDiv = document.getElementById("remaining");
+  const statusDiv = document.getElementById("status");
+
+  // 🔥 Dynamic average
+  let avgH = parseInt(document.getElementById("avgH").value) || 0;
+  let avgM = parseInt(document.getElementById("avgM").value) || 0;
+  let avgPerDay = (avgH * 60) + avgM;
+  let weeklyTarget = avgPerDay * 5;
+
+  let total = 0;
+  let filledDays = 0;
+  let earlyDays = 0;
+
+  values.forEach(v => {
+    if (v !== null) {
+      total += v;
+      filledDays++;
+
+      if (v < avgPerDay) earlyDays++;
+    }
+  });
+
+  let remaining = weeklyTarget - total;
+  let remainingDays = 5 - filledDays;
+
+  let h = Math.floor(total / 60);
+  let m = total % 60;
+
+  totalDiv.innerText = `Total: ${h}h ${m}m`;
+
+  // identify today
+  let todayIndex = values.map((v,i) => v !== null ? i : -1).filter(i => i !== -1).pop();
+  let todayMinutes = todayIndex !== undefined ? values[todayIndex] : null;
+
+  let todayH = Math.floor((todayMinutes || 0) / 60);
+  let todayM = (todayMinutes || 0) % 60;
+
+  if (remaining <= 0) {
+    remainingDiv.innerText = `Remaining: 0h 0m`;
+    statusDiv.innerText = "✅ You can leave now";
+    statusDiv.className = "status green";
+    return;
+  }
+
+  let rh = Math.floor(remaining / 60);
+  let rm = remaining % 60;
+
+  remainingDiv.innerText = `Remaining: ${rh}h ${rm}m`;
+
+  // 🔥 Early leave logic with limit
+  if (todayMinutes !== null && todayMinutes < avgPerDay) {
+
+    if (earlyDays > 2) {
+      statusDiv.innerText =
+        `❌ Early leave limit exceeded (max 2 days)\n` +
+        `Today: ${todayH}h ${todayM}m → complete target`;
+
+      statusDiv.className = "status red";
+      return;
+    }
+
+    statusDiv.innerText =
+      `✅ You can go home early today (${todayH}h ${todayM}m logged)\n` +
+      `📊 Remaining will be adjusted over ${remainingDays} day(s)\n` +
+      `⚠️ Early days used: ${earlyDays}/2`;
+
+    statusDiv.className = "status green";
+    return;
+  }
+
+  // distribution
+  if (remainingDays > 0) {
+    let perDay = Math.ceil(remaining / remainingDays);
+
+    let pdH = Math.floor(perDay / 60);
+    let pdM = perDay % 60;
+
+    statusDiv.innerText =
+      `📊 Need ~${pdH}h ${pdM}m per remaining day (${remainingDays} day(s))\n` +
+      `⚠️ Early days used: ${earlyDays}/2`;
+
+    statusDiv.className = "status";
+  } else {
+    statusDiv.innerText =
+      `❌ Need ${rh}h ${rm}m more today`;
+
+    statusDiv.className = "status red";
+  }
+}
+</script>
+
+</body>
+</html>
