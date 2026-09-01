@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    :root {
+      --bg: #121212;
+      --input-bg: #1e1e1e;
+      --accent: #4caf50;
+    }
+
+    body {
+      font-family: Arial;
+      width: 280px;
+      padding: 15px;
+      background: var(--bg);
+      color: white;
+      transition: background 0.3s ease;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 6px;
+      border: none;
+      background: var(--input-bg);
+      color: white;
+      font-size: 14px;
+      transition: background 0.3s ease;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .row input {
+      width: 50%;
+    }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 8px 0;
+    }
+
+    .setting-row label {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .setting-row input {
+      width: 50px;
+      flex-shrink: 0;
+      margin: 0;
+      text-align: center;
+    }
+
+    .field-label {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .day-row.hidden {
+      display: none;
+    }
+
+    .theme-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .swatch {
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      margin: 0;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    .swatch.active {
+      border-color: white;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-row .primary {
+      flex: 1;
+    }
+
+    .icon-btn {
+      width: 40px;
+      flex-shrink: 0;
+      padding: 0;
+      background: #333;
+      font-size: 15px;
+      transition: background 0.3s ease;
+    }
+
+    .icon-btn:hover {
+      background: var(--accent);
+    }
+
+    .tab-row {
+      display: flex;
+      gap: 6px;
+      margin: 10px 0;
+    }
+
+    .tab {
+      flex: 1;
+      width: auto;
+      margin: 0;
+      padding: 6px;
+      font-size: 12px;
+      font-weight: normal;
+      background: #333;
+      color: #ccc;
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: white;
+      font-weight: bold;
+    }
+
+    .fun-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .pill {
+      width: auto;
+      min-width: 44px;
+      height: 32px;
+      padding: 0 12px;
+      margin: 0;
+      font-size: 16px;
+      font-weight: normal;
+      border-radius: 16px;
+      background: #333;
+      color: #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pill.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .fun-refresh {
+      margin-left: auto;
+      width: 24px;
+      height: 24px;
+      margin-top: 0;
+      padding: 0;
+      font-size: 12px;
+    }
+
+    .fun-text {
+      font-size: 12px;
+      color: #ddd;
+      line-height: 1.4;
+      min-height: 40px;
+    }
+
+    .icon-img {
+      width: 22px;
+      height: 22px;
+      vertical-align: middle;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .status {
+    margin-top: 10px;
+    font-size: 13px;
+    white-space: pre-line;
+  }
+  .good { color: #4caf50; }
+  .bad { color: #f44336; }
+  .neutral { color: #ccc; }
+  </style>
+</head>
+
+<body>
+
+<h3>⏱ Work Hours</h3>
+
+<div class="theme-row" title="Color theme">
+  <button type="button" class="swatch active" data-theme="default" style="background:#4caf50" title="Default"></button>
+  <button type="button" class="swatch" data-theme="blue" style="background:#2196f3" title="Blue"></button>
+  <button type="button" class="swatch" data-theme="purple" style="background:#9c27b0" title="Purple"></button>
+  <button type="button" class="swatch" data-theme="orange" style="background:#ff9800" title="Orange"></button>
+  <button type="button" class="swatch" data-theme="teal" style="background:#00bcd4" title="Teal"></button>
+</div>
+
+<div class="tab-row">
+  <button type="button" class="tab active" id="hoursTabBtn" title="Hours">⏱</button>
+  <button type="button" class="tab" id="funTabBtn" title="Fun"><img src="fun-tab-icon.svg" class="icon-img"></button>
+</div>
+
+<div id="hoursPanel">
+  <span class="field-label">Avg Hours per Day</span>
+  <div class="row">
+    <input id="avgH" type="number" value="8" min="0">
+    <input id="avgM" type="number" value="0" min="0" max="59">
+  </div>
+
+  <div class="setting-row">
+    <label for="workDays">Working Days/Week</label>
+    <input id="workDays" type="number" value="5" min="1" max="7">
+  </div>
+
+  <div class="day-row" data-day="1"><input id="mon" placeholder="Monday" inputmode="numeric" maxlength="5"></div>
+  <div class="day-row" data-day="2"><input id="tue" placeholder="Tuesday" inputmode="numeric" maxlength="5"></div>
+  <div class="day-row" data-day="3"><input id="wed" placeholder="Wednesday" inputmode="numeric" maxlength="5"></div>
+  <div class="day-row" data-day="4"><input id="thu" placeholder="Thursday" inputmode="numeric" maxlength="5"></div>
+  <div class="day-row" data-day="5"><input id="fri" placeholder="Friday" inputmode="numeric" maxlength="5"></div>
+  <div class="day-row" data-day="6"><input id="sat" placeholder="Saturday" inputmode="numeric" maxlength="5"></div>
+  <div class="day-row" data-day="7"><input id="sun" placeholder="Sunday" inputmode="numeric" maxlength="5"></div>
+
+  <div class="btn-row">
+    <button id="load" class="primary">Fetch from Keka</button>
+    <button type="button" id="clearBtn" class="icon-btn" title="Clear time entries">🗑</button>
+  </div>
+  <div id="status" class="status"></div>
+</div>
+
+<div id="funPanel" style="display:none">
+  <div class="fun-header">
+    <button type="button" class="pill active" id="quoteTab" title="Wisdom">🧠</button>
+    <button type="button" class="pill" id="jokeTab" title="Sarcasm"><img src="cat-icon.svg" class="icon-img"></button>
+    <button type="button" class="icon-btn fun-refresh" id="refreshFunBtn" title="Get another">🔄</button>
+  </div>
+  <div id="funText" class="fun-text">Loading…</div>
+</div>
+
+<script src="popup.js"></script>
+
+</body>
+</html>

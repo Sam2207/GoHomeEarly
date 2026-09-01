@@ -1,0 +1,36 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- ears -->
+  <path d="M14,40 L23,6 Q25,2 28,5 L41,33 Z" fill="#ffcf3f" stroke="#b5651d" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M86,40 L77,6 Q75,2 72,5 L59,33 Z" fill="#ffcf3f" stroke="#b5651d" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M20,31 L24,15" stroke="#fff6cf" stroke-width="3" stroke-linecap="round"/>
+  <path d="M80,31 L76,15" stroke="#fff6cf" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- head -->
+  <circle cx="50" cy="58" r="40" fill="#fbe94a" stroke="#b5651d" stroke-width="4"/>
+
+  <!-- cowlick -->
+  <path d="M44,20 Q46,9 52,13 Q57,16 51,21 Q59,19 56,27 Q49,31 44,24 Z" fill="#ffcf3f" stroke="#b5651d" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- eyebrows -->
+  <path d="M24,47 Q34,36 45,44" fill="none" stroke="#b5651d" stroke-width="4" stroke-linecap="round"/>
+  <path d="M55,44 Q66,36 76,47" fill="none" stroke="#b5651d" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- eyes -->
+  <path d="M21,61 Q21,48 34,48 Q47,48 47,61 Q34,68 21,61 Z" fill="#fff" stroke="#b5651d" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="30" cy="56" r="6.5" fill="#7a4a1e"/>
+  <circle cx="32.5" cy="53.5" r="2.2" fill="#fff"/>
+
+  <path d="M53,61 Q53,48 66,48 Q79,48 79,61 Q66,68 53,61 Z" fill="#fff" stroke="#b5651d" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="70" cy="56" r="6.5" fill="#7a4a1e"/>
+  <circle cx="72.5" cy="53.5" r="2.2" fill="#fff"/>
+
+  <!-- blush -->
+  <circle cx="19" cy="73" r="9.5" fill="#ff9fb0"/>
+  <circle cx="81" cy="73" r="9.5" fill="#ff9fb0"/>
+
+  <!-- mouth -->
+  <path d="M31,74 Q50,94 69,74 Q67,89 50,91 Q33,89 31,74 Z" fill="#fff" stroke="#b5651d" stroke-width="4" stroke-linejoin="round"/>
+  <line x1="41" y1="80" x2="41" y2="88" stroke="#b5651d" stroke-width="2.2"/>
+  <line x1="50" y1="82" x2="50" y2="90" stroke="#b5651d" stroke-width="2.2"/>
+  <line x1="59" y1="80" x2="59" y2="88" stroke="#b5651d" stroke-width="2.2"/>
+</svg>

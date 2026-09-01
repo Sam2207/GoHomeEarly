@@ -5,21 +5,30 @@
   <meta charset="UTF-8">
   <link rel="icon" type="image/png" href="image.png">
   <style>
+    :root {
+      --bg: #121212;
+      --card-bg: #1e1e1e;
+      --input-bg: #2a2a2a;
+      --accent: #4caf50;
+    }
+
     body {
       font-family: Arial;
-      background: #121212;
+      background: var(--bg);
       color: white;
       display: flex;
       justify-content: center;
       padding-top: 40px;
+      transition: background 0.4s ease;
     }
 
     .card {
-      background: #1e1e1e;
+      background: var(--card-bg);
       padding: 25px;
       border-radius: 12px;
       width: 360px;
       box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      transition: background 0.4s ease;
     }
 
     input {
@@ -29,8 +38,9 @@
       border-radius: 6px;
       border: none;
       font-size: 16px;
-      background: #2a2a2a;
+      background: var(--input-bg);
       color: white;
+      transition: background 0.4s ease;
     }
 
     .row {
@@ -42,31 +52,212 @@
       width: 50%;
     }
 
+    .day-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 6px 0;
+    }
+
+    .day-row label {
+      width: 36px;
+      flex-shrink: 0;
+      font-size: 13px;
+      color: #999;
+    }
+
+    .day-row input {
+      margin: 0;
+    }
+
+    .day-row.hidden {
+      display: none;
+    }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .setting-row label {
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    .setting-row input {
+      width: 56px;
+      flex-shrink: 0;
+      margin: 0;
+      padding: 8px;
+      text-align: center;
+    }
+
+    input.input-error {
+      box-shadow: 0 0 0 1.5px #f44336;
+    }
+
     button {
       width: 100%;
       padding: 10px;
       margin-top: 12px;
-      background: #4caf50;
+      background: var(--accent);
       border: none;
       border-radius: 6px;
       font-size: 16px;
       color: white;
       cursor: pointer;
+      transition: background 0.4s ease;
     }
 
-    .output {
+    .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-row button {
+      width: auto;
+    }
+
+    .btn-row .primary {
+      flex: 3;
+    }
+
+    .btn-row .secondary {
+      flex: 1;
+      background: #333;
+    }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+    }
+
+    .icon-btn {
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      margin: 0;
+      font-size: 15px;
+      line-height: 1;
+      border-radius: 8px;
+      background: var(--input-bg);
+      border: none;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
+    }
+
+    .icon-btn:hover {
+      background: var(--accent);
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 10px;
       margin-top: 15px;
+    }
+
+    .stat {
+      flex: 1;
+      background: var(--input-bg);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      transition: background 0.4s ease;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 4px;
     }
 
     .status {
       margin-top: 10px;
+      padding: 10px 12px;
+      background: var(--input-bg);
+      border-radius: 8px;
+      border-left: 4px solid #555;
       font-weight: bold;
-      font-size: 16px;
+      font-size: 15px;
       white-space: pre-line;
+      transition: background 0.4s ease;
     }
 
-    .green { color: #4caf50; }
-    .red { color: #f44336; }
+    .green { color: #4caf50; border-left-color: #4caf50 !important; }
+    .red { color: #f44336; border-left-color: #f44336 !important; }
+
+    .fun-box {
+      margin-top: 15px;
+      background: var(--input-bg);
+      border-radius: 8px;
+      padding: 12px;
+      transition: background 0.4s ease;
+    }
+
+    .fun-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .pill {
+      width: auto;
+      min-width: 48px;
+      height: 34px;
+      padding: 0 14px;
+      margin: 0;
+      font-size: 18px;
+      line-height: 1;
+      border-radius: 20px;
+      background: #333;
+      color: #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .pill.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .fun-header .icon-btn {
+      margin-left: auto;
+      width: 26px;
+      height: 26px;
+      font-size: 13px;
+    }
+
+    .icon-img {
+      width: 20px;
+      height: 20px;
+      vertical-align: middle;
+    }
+
+    .fun-text {
+      font-size: 13px;
+      color: #ddd;
+      line-height: 1.4;
+      min-height: 32px;
+    }
   </style>
 </head>
 
@@ -74,7 +265,7 @@
 
 <div class="card">
   <div style="margin-bottom:15px;">
-  <button onclick="downloadExtension()">⬇ Download Extension</button>
+  <button onclick="downloadExtension(event)">⬇ Download Extension</button>
 
   <button style="background:#333; margin-top:8px;" onclick="showSteps()">
     📘 How to Install
@@ -102,6 +293,18 @@
 <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
   <img src="image.png" style="width:60px; height:60px;">
   <h2 style="margin:0;">Work Hours</h2>
+  <div class="theme-toggle">
+    <button type="button" class="icon-btn" onclick="shuffleTheme()" title="Shuffle theme colors">
+      <svg viewBox="0 0 24 24" width="16" height="16">
+        <g style="isolation:isolate">
+          <circle cx="12" cy="8" r="7" fill="#1e9be9"/>
+          <circle cx="8" cy="15" r="7" fill="#ffc93c" style="mix-blend-mode:multiply"/>
+          <circle cx="16" cy="15" r="7" fill="#ff3f7f" style="mix-blend-mode:multiply"/>
+        </g>
+      </svg>
+    </button>
+    <button type="button" class="icon-btn" onclick="resetTheme()" title="Reset to default theme">↺</button>
+  </div>
 </div>
 
   <!-- 🔥 Adjustable Average -->
@@ -111,19 +314,68 @@
     <input id="avgM" type="number" value="0" min="0" max="59">
   </div>
 
-  <input id="mon" placeholder="Monday (9:42)">
-  <input id="tue" placeholder="Tuesday (8:07)">
-  <input id="wed" placeholder="Wednesday (9:47)">
-  <input id="thu" placeholder="Thursday (7:00)">
-  <input id="fri" placeholder="Friday (8:00)">
+  <div class="setting-row">
+    <label for="workDays">Working Days per Week</label>
+    <input id="workDays" type="number" value="5" min="1" max="7">
+  </div>
 
-  <button onclick="calc()">Calculate</button>
+  <div class="day-row" data-day="1">
+    <label for="mon">Mon</label>
+    <input id="mon" placeholder="9:42" inputmode="numeric" maxlength="5">
+  </div>
+  <div class="day-row" data-day="2">
+    <label for="tue">Tue</label>
+    <input id="tue" placeholder="8:07" inputmode="numeric" maxlength="5">
+  </div>
+  <div class="day-row" data-day="3">
+    <label for="wed">Wed</label>
+    <input id="wed" placeholder="9:47" inputmode="numeric" maxlength="5">
+  </div>
+  <div class="day-row" data-day="4">
+    <label for="thu">Thu</label>
+    <input id="thu" placeholder="7:00" inputmode="numeric" maxlength="5">
+  </div>
+  <div class="day-row" data-day="5">
+    <label for="fri">Fri</label>
+    <input id="fri" placeholder="8:00" inputmode="numeric" maxlength="5">
+  </div>
+  <div class="day-row" data-day="6">
+    <label for="sat">Sat</label>
+    <input id="sat" placeholder="0:00" inputmode="numeric" maxlength="5">
+  </div>
+  <div class="day-row" data-day="7">
+    <label for="sun">Sun</label>
+    <input id="sun" placeholder="0:00" inputmode="numeric" maxlength="5">
+  </div>
 
-  <div id="total" class="output"></div>
-  <div id="remaining" class="output"></div>
+  <div class="btn-row">
+    <button class="primary" onclick="calc()">Calculate</button>
+    <button class="secondary" onclick="clearTimes()" title="Clear time entries">Clear</button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-label">Total</div>
+      <div class="stat-value" id="total">--</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Remaining</div>
+      <div class="stat-value" id="remaining">--</div>
+    </div>
+  </div>
   <div id="status" class="status"></div>
+
+  <div class="fun-box">
+    <div class="fun-header">
+      <button class="pill active" id="quoteTab" onclick="switchFun('quote')" title="Wisdom">🧠</button>
+      <button class="pill" id="jokeTab" onclick="switchFun('joke')" title="Sarcasm"><img src="extensions/keka-sync/cat-icon.svg" class="icon-img"></button>
+      <button class="icon-btn" onclick="fetchFun()" title="Get another">🔄</button>
+    </div>
+    <div id="funText" class="fun-text">Loading…</div>
+  </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 function toMinutes(val) {
   if (!val || !val.includes(":")) return null;
@@ -131,9 +383,47 @@ function toMinutes(val) {
   return h * 60 + m;
 }
 
-function downloadExtension() {
-  // 🔥 replace with your actual zip path
-  window.open("./extensions/keka-sync.zip", "_blank");
+const KEKA_SYNC_FILES = [
+  "manifest.json",
+  "content.js",
+  "popup.html",
+  "popup.js",
+  "icon128.png",
+  "cat-icon.svg",
+  "fun-tab-icon.svg"
+];
+
+// zips the current extension files in-browser so the download always
+// reflects whatever's actually in extensions/keka-sync/, no stale prebuilt zip
+async function downloadExtension(e) {
+  const btn = e.target.closest("button");
+  const originalText = btn.textContent;
+  btn.textContent = "Zipping…";
+  btn.disabled = true;
+
+  try {
+    const zip = new JSZip();
+    const folder = zip.folder("keka-sync");
+
+    await Promise.all(KEKA_SYNC_FILES.map(async (file) => {
+      const res = await fetch(`extensions/keka-sync/${file}`);
+      const blob = await res.blob();
+      folder.file(file, blob);
+    }));
+
+    const blob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "keka-sync.zip";
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    alert("Couldn't build the extension zip. Please try again.");
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
 }
 
 function showSteps() {
@@ -146,8 +436,167 @@ function openExtensions() {
   document.getElementById("copyMsg").style.display = "block";
 }
 
+const THEME_KEY = "goHomeEarly-theme-hue";
+
+function applyTheme(hue) {
+  const root = document.documentElement.style;
+  root.setProperty("--accent", `hsl(${hue}, 65%, 50%)`);
+  root.setProperty("--bg", `hsl(${hue}, 25%, 8%)`);
+  root.setProperty("--card-bg", `hsl(${hue}, 20%, 13%)`);
+  root.setProperty("--input-bg", `hsl(${hue}, 18%, 19%)`);
+}
+
+function shuffleTheme() {
+  const hue = Math.floor(Math.random() * 360);
+  applyTheme(hue);
+  localStorage.setItem(THEME_KEY, hue);
+}
+
+function resetTheme() {
+  const root = document.documentElement.style;
+  root.removeProperty("--accent");
+  root.removeProperty("--bg");
+  root.removeProperty("--card-bg");
+  root.removeProperty("--input-bg");
+  localStorage.removeItem(THEME_KEY);
+}
+
+const savedHue = localStorage.getItem(THEME_KEY);
+if (savedHue !== null) applyTheme(Number(savedHue));
+
+const DAY_IDS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const DATA_KEY = "goHomeEarly-data";
+
+function getWeekStartKey() {
+  const now = new Date();
+  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((now.getDay() + 6) % 7));
+  const y = monday.getFullYear();
+  const m = String(monday.getMonth() + 1).padStart(2, "0");
+  const d = String(monday.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function saveData() {
+  const data = {
+    weekStart: getWeekStartKey(),
+    avgH: document.getElementById("avgH").value,
+    avgM: document.getElementById("avgM").value,
+    workDays: document.getElementById("workDays").value,
+  };
+  DAY_IDS.forEach(id => { data[id] = document.getElementById(id).value; });
+  localStorage.setItem(DATA_KEY, JSON.stringify(data));
+}
+
+function loadData() {
+  const raw = localStorage.getItem(DATA_KEY);
+  if (!raw) return;
+  const data = JSON.parse(raw);
+  if (data.avgH !== undefined) document.getElementById("avgH").value = data.avgH;
+  if (data.avgM !== undefined) document.getElementById("avgM").value = data.avgM;
+  if (data.workDays !== undefined) document.getElementById("workDays").value = data.workDays;
+
+  // a new work week means last week's day times are stale — don't carry them over
+  const isNewWeek = data.weekStart !== undefined && data.weekStart !== getWeekStartKey();
+  if (isNewWeek) {
+    saveData();
+    return;
+  }
+
+  DAY_IDS.forEach(id => {
+    if (data[id] !== undefined) document.getElementById(id).value = data[id];
+  });
+}
+
+function clearTimes() {
+  DAY_IDS.forEach(id => {
+    const input = document.getElementById(id);
+    input.value = "";
+    input.classList.remove("input-error");
+  });
+  saveData();
+
+  document.getElementById("total").textContent = "--";
+  document.getElementById("remaining").textContent = "--";
+  const statusDiv = document.getElementById("status");
+  statusDiv.textContent = "";
+  statusDiv.className = "status";
+}
+
+function getWorkDays() {
+  const n = parseInt(document.getElementById("workDays").value) || 5;
+  return Math.min(7, Math.max(1, n));
+}
+
+function updateVisibleDays() {
+  const workDays = getWorkDays();
+  document.querySelectorAll(".day-row").forEach(row => {
+    row.classList.toggle("hidden", Number(row.dataset.day) > workDays);
+  });
+}
+
+loadData();
+updateVisibleDays();
+
+document.getElementById("workDays").addEventListener("input", () => {
+  updateVisibleDays();
+  saveData();
+});
+
+["avgH", "avgM"].forEach(id => {
+  document.getElementById(id).addEventListener("input", saveData);
+});
+
+function formatTimeInput(e) {
+  const input = e.target;
+
+  // keep only digits and colon, then keep just the first colon
+  let raw = input.value.replace(/[^\d:]/g, "");
+  const firstColon = raw.indexOf(":");
+  if (firstColon !== -1) {
+    raw = raw.slice(0, firstColon + 1) + raw.slice(firstColon + 1).replace(/:/g, "");
+  }
+
+  // a colon needs a digit before it, otherwise drop it
+  if (raw.startsWith(":")) raw = raw.slice(1);
+
+  const hasColon = raw.includes(":");
+  let hh, mm;
+
+  if (hasColon) {
+    [hh, mm] = raw.split(":");
+    hh = hh.slice(0, 2);
+    mm = mm.slice(0, 2);
+  } else {
+    const digits = raw.slice(0, 4);
+    hh = digits.slice(0, 2);
+    mm = digits.slice(2);
+  }
+
+  if (hh.length === 2 && Number(hh) > 24) hh = "24";
+  if (mm.length >= 1 && Number(mm[0]) > 5) mm = "5" + mm.slice(1);
+  if (mm.length === 2 && Number(mm) > 59) mm = "59";
+  if (hh === "24" && mm.length > 0 && Number(mm) > 0) mm = "00";
+
+  input.value = hasColon || mm ? hh + ":" + mm : hh;
+  input.classList.remove("input-error");
+}
+
+function validateTimeInput(e) {
+  const input = e.target;
+  const valid = input.value === "" || /^\d{1,2}:\d{2}$/.test(input.value);
+  input.classList.toggle("input-error", !valid);
+}
+
+DAY_IDS.forEach(id => {
+  const input = document.getElementById(id);
+  input.addEventListener("input", formatTimeInput);
+  input.addEventListener("input", saveData);
+  input.addEventListener("blur", validateTimeInput);
+});
+
 function calc() {
-  const ids = ["mon","tue","wed","thu","fri"];
+  const workDays = getWorkDays();
+  const ids = DAY_IDS.slice(0, workDays);
   const values = ids.map(id => toMinutes(document.getElementById(id).value));
 
   const totalDiv = document.getElementById("total");
@@ -158,7 +607,7 @@ function calc() {
   let avgH = parseInt(document.getElementById("avgH").value) || 0;
   let avgM = parseInt(document.getElementById("avgM").value) || 0;
   let avgPerDay = (avgH * 60) + avgM;
-  let weeklyTarget = avgPerDay * 5;
+  let weeklyTarget = avgPerDay * workDays;
 
   let total = 0;
   let filledDays = 0;
@@ -174,22 +623,23 @@ function calc() {
   });
 
   let remaining = weeklyTarget - total;
-  let remainingDays = 5 - filledDays;
+  let remainingDays = workDays - filledDays;
 
   let h = Math.floor(total / 60);
   let m = total % 60;
 
-  totalDiv.innerText = `Total: ${h}h ${m}m`;
+  totalDiv.innerText = `${h}h ${m}m`;
 
-  // identify today
-  let todayIndex = values.map((v,i) => v !== null ? i : -1).filter(i => i !== -1).pop();
-  let todayMinutes = todayIndex !== undefined ? values[todayIndex] : null;
+  // identify today (Date.getDay(): 0=Sun..6=Sat -> shift so 0=Mon..6=Sun to match DAY_IDS)
+  const todayId = DAY_IDS[(new Date().getDay() + 6) % 7];
+  const todayIndex = ids.indexOf(todayId);
+  let todayMinutes = todayIndex !== -1 ? values[todayIndex] : null;
 
   let todayH = Math.floor((todayMinutes || 0) / 60);
   let todayM = (todayMinutes || 0) % 60;
 
   if (remaining <= 0) {
-    remainingDiv.innerText = `Remaining: 0h 0m`;
+    remainingDiv.innerText = `0h 0m`;
     statusDiv.innerText = "✅ You can leave now";
     statusDiv.className = "status green";
     return;
@@ -198,7 +648,7 @@ function calc() {
   let rh = Math.floor(remaining / 60);
   let rm = remaining % 60;
 
-  remainingDiv.innerText = `Remaining: ${rh}h ${rm}m`;
+  remainingDiv.innerText = `${rh}h ${rm}m`;
 
   // 🔥 Early leave logic with limit
   if (todayMinutes !== null && todayMinutes < avgPerDay) {
@@ -240,6 +690,95 @@ function calc() {
     statusDiv.className = "status red";
   }
 }
+
+let funMode = "quote";
+
+function switchFun(mode) {
+  funMode = mode;
+  document.getElementById("quoteTab").classList.toggle("active", mode === "quote");
+  document.getElementById("jokeTab").classList.toggle("active", mode === "joke");
+  fetchFun();
+}
+
+const SARCASTIC_JOKES = [
+  "I'm not saying I hate you, but I'd unplug your life support to charge my phone.",
+  "You bring everyone so much joy... when you leave the room.",
+  "I'd explain it to you, but I left my crayons at home.",
+  "Wow, you did that all by yourself? Did it hurt?",
+  "I'm jealous of people who don't know you.",
+  "Sure, I'll get right on that — said no one after you asked.",
+  "Oh, you're leaving early? What a shocking, never-before-seen turn of events.",
+  "I love how confident you are in being completely wrong.",
+  "Keep talking, I love yawning.",
+  "Sure, blame the WiFi. It's always the WiFi's fault.",
+  "You're proof that even evolution takes a day off sometimes.",
+  "Wow, another meeting that could've been an email. Groundbreaking.",
+  "I'd agree with you, but then we'd both be wrong.",
+  "Don't worry, I forgot your name too.",
+  "Nice plan. Very ambitious of you to think it'll work.",
+  "Oh, you have an opinion? How refreshing.",
+  "I'm not arguing, I'm just explaining why I'm right.",
+  "You're entitled to your wrong opinion.",
+  "Please, continue. I always yawn when I'm interested.",
+  "Nice job. I especially loved the part where it didn't work at all.",
+  "Oh sure, because that plan has never failed before... every single time.",
+  "Take your time. It's not like anyone else is waiting.",
+  "Wow, I didn't know silence could be this loud.",
+  "Thanks for explaining that to me like I'm five. I'm actually six.",
+  "I'm sure that made sense in your head.",
+  "Let me guess, it's everyone else's fault again.",
+  "I'd love to stay and chat, but I'd rather not.",
+  "Your confidence is inspiring, considering how wrong you are.",
+  "Sure, let's do it your way. I love watching disasters unfold.",
+  "You must be exhausted from jumping to conclusions all day.",
+  "I'm not saying I'm always right, but I don't remember ever being wrong.",
+  "Oh look, you found the one way to make this worse.",
+  "I'd agree with you, but I actually thought about it.",
+  "Please, enlighten me with more things I already know.",
+  "Ah yes, because 'winging it' has worked so well for you so far.",
+  "I admire your commitment to being consistently late.",
+  "Don't worry, mediocrity looks great on you.",
+  "You have the right to remain silent. Please consider using it.",
+  "I see you've mastered the art of doing the bare minimum.",
+  "Oh good, another brilliant idea from the guy who lost the stapler.",
+  "I love a good mystery, like how you still have a job.",
+  "Relax, it's not like your plan could've gone any worse. Oh wait.",
+  "I'm sure the deadline was just a suggestion, right?",
+  "Impressive. You turned a five-minute task into a three-day project.",
+  "Oh, you're 'multitasking'? Is that what we're calling doing nothing twice?",
+  "Sure, tell me more about how busy you are doing absolutely nothing.",
+  "Your logic is truly a unique work of fiction.",
+  "Congratulations, you played yourself.",
+  "Oh, is it 'someone else's problem' o'clock again?",
+  "I love how you make every small task look like a five-act tragedy.",
+  "Please, keep talking. I need something to fall asleep to.",
+  "It's cute that you think that's a good excuse.",
+  "Ah, the classic 'it worked on my machine' defense.",
+  "I'm sure you'll get it right eventually. Ish.",
+  "You're not lazy, you're just extremely conservative with your effort.",
+  "Wow, a fresh new way to be wrong. Impressive creativity.",
+  "Your plan has 'ambitious' written all over it — and by ambitious, I mean doomed."
+];
+
+async function fetchFun() {
+  const el = document.getElementById("funText");
+  el.textContent = "Loading…";
+
+  try {
+    if (funMode === "quote") {
+      const res = await fetch("https://www.stoic-quotes.com/api/quote");
+      const data = await res.json();
+      el.textContent = `"${data.text}" — ${data.author}`;
+    } else {
+      const joke = SARCASTIC_JOKES[Math.floor(Math.random() * SARCASTIC_JOKES.length)];
+      el.textContent = joke;
+    }
+  } catch (err) {
+    el.textContent = "Couldn't fetch right now — try again.";
+  }
+}
+
+fetchFun();
 </script>
 
 </body>
