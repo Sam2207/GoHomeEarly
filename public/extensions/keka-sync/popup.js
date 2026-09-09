@@ -109,13 +109,25 @@ function calc(data) {
   const weeklyTarget = avgPerDay * workDays;
 
   const ids = DAY_IDS.slice(0, workDays);
+  const values = ids.map(d => toMinutes(data[d]));
+
+  // 🎯 TODAY LOGIC
+  const todayId = getTodayKey();
+  const todayIdx = ids.indexOf(todayId);
+
+  // 0:00 today usually just means "not clocked out yet" — don't count it as a
+  // real (early) day. But if a later day already has data, today has clearly
+  // already ended, so treat its 0:00 as genuine.
+  if (todayIdx !== -1 && values[todayIdx] === 0) {
+    const hasLaterData = values.slice(todayIdx + 1).some(v => v !== null);
+    if (!hasLaterData) values[todayIdx] = null;
+  }
 
   let total = 0;
   let earlyDays = 0;
   let filledDays = 0;
 
-  ids.forEach(d => {
-    const mins = toMinutes(data[d]);
+  values.forEach(mins => {
     if (mins !== null) {
       total += mins;
       filledDays++;
@@ -131,10 +143,7 @@ function calc(data) {
 
   let statusClass = "neutral";
 
-  // 🎯 TODAY LOGIC
-  const todayId = getTodayKey();
-  const todayIdx = ids.indexOf(todayId);
-  const todayMinutes = todayIdx !== -1 ? toMinutes(data[todayId]) : null;
+  const todayMinutes = todayIdx !== -1 ? values[todayIdx] : null;
 
   if (remaining <= 0) {
     result += "✅ You can go home now";
@@ -193,11 +202,36 @@ function clearTimes() {
   updateCalculation();
 }
 
+// manually flag any day — past, present, or future — as a leave day, filled
+// with the configurable Leave Hours setting (not tied to any one person's
+// default, since it reads whatever's currently set)
+function markLeave(dayId) {
+  const leaveH = parseInt(document.getElementById("leaveH").value) || 8;
+  const leaveM = parseInt(document.getElementById("leaveM").value) || 0;
+  document.getElementById(dayId).value = `${leaveH}:${String(leaveM).padStart(2, "0")}`;
+  saveDayData();
+  updateCalculation();
+}
+
+document.querySelectorAll(".leave-btn").forEach(btn => {
+  btn.addEventListener("click", () => markLeave(btn.dataset.target));
+});
+
+document.getElementById("leaveToggle").addEventListener("click", () => {
+  const row = document.getElementById("leaveRow");
+  const arrow = document.getElementById("leaveArrow");
+  const isHidden = row.style.display === "none";
+  row.style.display = isHidden ? "" : "none";
+  arrow.textContent = isHidden ? "▾" : "▸";
+});
+
 function saveSettings() {
   chrome.storage.local.set({
     [SETTINGS_KEY]: {
       avgH: document.getElementById("avgH").value,
       avgM: document.getElementById("avgM").value,
+      leaveH: document.getElementById("leaveH").value,
+      leaveM: document.getElementById("leaveM").value,
       workDays: document.getElementById("workDays").value,
     }
   });
@@ -208,6 +242,8 @@ function load() {
     const settings = result[SETTINGS_KEY] || {};
     if (settings.avgH !== undefined) document.getElementById("avgH").value = settings.avgH;
     if (settings.avgM !== undefined) document.getElementById("avgM").value = settings.avgM;
+    if (settings.leaveH !== undefined) document.getElementById("leaveH").value = settings.leaveH;
+    if (settings.leaveM !== undefined) document.getElementById("leaveM").value = settings.leaveM;
     if (settings.workDays !== undefined) document.getElementById("workDays").value = settings.workDays;
     updateVisibleDays();
 
@@ -245,6 +281,11 @@ document.getElementById("clearBtn").addEventListener("click", clearTimes);
     saveSettings();
     updateCalculation();
   });
+});
+
+// leave hours only affect future Keka scrapes, not the current calculation
+["leaveH", "leaveM"].forEach(id => {
+  document.getElementById(id).addEventListener("input", saveSettings);
 });
 
 document.getElementById("workDays").addEventListener("input", () => {
@@ -369,7 +410,107 @@ const SARCASTIC_JOKES = [
   "I'm sure you'll get it right eventually. Ish.",
   "You're not lazy, you're just extremely conservative with your effort.",
   "Wow, a fresh new way to be wrong. Impressive creativity.",
-  "Your plan has 'ambitious' written all over it — and by ambitious, I mean doomed."
+  "Your plan has 'ambitious' written all over it — and by ambitious, I mean doomed.",
+  "Oh, you're an expert now? Must've read the first paragraph of Wikipedia.",
+  "I'd call you a genius, but that seems like false advertising.",
+  "Sure, let's schedule another meeting about the meeting we just had.",
+  "Wow, you actually showed up on time. Should I mark this on a calendar?",
+  "I love your confidence. It's almost as impressive as your accuracy.",
+  "Oh, you have a plan? Let me guess, it involves winging it.",
+  "Take all the time you need. It's not like deadlines exist.",
+  "Your typing speed is inspiring. At this rate, we'll finish by next year.",
+  "I admire how you turn a five-second task into a philosophical debate.",
+  "Sure, I'll just read your mind next time instead of asking questions.",
+  "Oh, you multitasked? I didn't realize scrolling your phone counted.",
+  "Nice try. Almost as convincing as your last excuse.",
+  "I'm sure the Wi-Fi is definitely the reason your work isn't done.",
+  "Your organizational skills are truly a masterclass in chaos.",
+  "Wow, you found the bug. Right after breaking it, impressive timing.",
+  "I love how 'ASAP' means 'whenever I feel like it' to you.",
+  "Sure, blame the printer. It's always plotting against you.",
+  "Your enthusiasm for doing nothing is honestly inspiring.",
+  "I'd explain the plan again, but I already used small words.",
+  "Oh, you're 'almost done'? That's cute, so was I an hour ago.",
+  "Your ability to avoid responsibility should be a LinkedIn skill.",
+  "Nice save. Truly Oscar-worthy improvisation.",
+  "I see you've perfected the art of looking busy.",
+  "Sure, tell me again how it's not your fault.",
+  "Wow, you actually read the instructions? Groundbreaking.",
+  "I love a good mystery novel, like your attendance record.",
+  "Your ability to procrastinate should come with a warning label.",
+  "Oh, you're 'working from home'? Netflix says otherwise.",
+  "I'm sure that email will send itself eventually.",
+  "Your confidence in being wrong is oddly consistent.",
+  "Nice plan. Did you draw that up during the meeting you weren't listening to?",
+  "Sure, let's trust the guy who lost the stapler with the budget.",
+  "I love how every deadline is a 'suggestion' to you.",
+  "Wow, you actually finished something. Frame it.",
+  "Your excuses have really evolved. Almost believable now.",
+  "I'm sure the dog ate your report too.",
+  "Oh, you're 'on it'? That's what you said yesterday too.",
+  "Nice work avoiding all the actual work.",
+  "Your commitment to mediocrity is genuinely impressive.",
+  "Sure, let's ask the guy who can't find his own desk for directions.",
+  "I love how confidently you say things that are completely wrong.",
+  "Wow, you replied to that email. Only took three weeks.",
+  "Your time management skills could use a time machine.",
+  "Oh, you're 'multitasking'? Explains why nothing's actually finished.",
+  "I'm sure that'll work out great, said no one ever.",
+  "Nice try blaming the intern. Very original.",
+  "Your ability to complicate simple things is a rare talent.",
+  "Sure, take a five-minute break. It's only been three hours.",
+  "I love your optimism. Completely detached from reality, but inspiring.",
+  "Wow, you actually remembered a deadline. Should we celebrate?",
+  "Your logic checks out, if you ignore all the facts.",
+  "Oh, you're 'busy'? Must be exhausting doing absolutely nothing.",
+  "I'm sure everyone else is definitely the problem here.",
+  "Nice job reinventing the wheel, but square this time.",
+  "Your consistency in being late is almost impressive.",
+  "Sure, let's give the benefit of the doubt for the fifth time.",
+  "I love how you call it 'strategic delay' instead of procrastination.",
+  "Wow, you actually double-checked your work. New record.",
+  "Your creativity in avoiding blame deserves an award.",
+  "Oh, you're 'thinking about it'? Take your time, no rush at all.",
+  "I'm sure the universe is conspiring against your productivity.",
+  "Nice recovery. Almost like you knew what you were doing.",
+  "Your ability to nod along without understanding is impressive.",
+  "Sure, let's redo it your way. I love a good disaster movie.",
+  "I love how you turn 'no' into a three-paragraph explanation.",
+  "Wow, you actually asked a good question. Miracles happen.",
+  "Your talent for finding the one wrong answer is unmatched.",
+  "Oh, you're 'on top of it'? From where, another planet?",
+  "I'm sure that typo was intentional, very avant-garde.",
+  "Nice hustle. Shame it's all in the wrong direction.",
+  "Your dedication to the bare minimum is truly aspirational.",
+  "Sure, let's trust the forecast from the guy who's always wrong.",
+  "I love how you treat every task like it's optional.",
+  "Wow, you actually showed initiative. Who are you and what did you do with the real you?",
+  "Your ability to overcomplicate a yes/no question is a gift.",
+  "Oh, you're 'in the zone'? Looks a lot like napping from here.",
+  "I'm sure the meeting really needed to run an extra hour.",
+  "Nice one. Truly a masterclass in missing the point.",
+  "Your patience for excuses is only matched by your patience for work.",
+  "Sure, let's hear your theory again, it gets funnier every time.",
+  "I love how you treat feedback like a personal attack.",
+  "Wow, you actually saved your work this time. Growth.",
+  "Your talent for making easy things hard is genuinely rare.",
+  "Oh, you're 'almost there'? You said that yesterday, and the day before.",
+  "I'm sure that deadline was just a gentle suggestion.",
+  "Nice effort. Really feels like you tried for at least a minute.",
+  "Your ability to disappear right before crunch time is legendary.",
+  "Sure, let's give you one more chance. What's the eleventh time, right?",
+  "I love how you call chaos 'creative process'.",
+  "Wow, you actually listened in that meeting. Historic moment.",
+  "Your knack for missing obvious details is truly a specialty.",
+  "Oh, you're 'handling it'? Handling it into the ground, maybe.",
+  "I'm sure that excuse gets better each time you practice it.",
+  "Nice work turning a two-minute task into a whole ordeal.",
+  "Your enthusiasm for other people's work is inspiring, shame it's not for yours.",
+  "Sure, let's applaud the bare minimum, why not.",
+  "I love how you rewrite history every time you're wrong.",
+  "Wow, an actual apology. Didn't think you had it in you.",
+  "Your gift for finding shortcuts to nowhere is unique.",
+  "Oh, you're 'on track'? Which track, because it's not this one."
 ];
 
 async function fetchFun() {

@@ -1,4 +1,20 @@
-function extractData() {
+const SETTINGS_KEY = "gheSettings";
+
+// leave/holiday days don't show an "Xh Ym" line on Keka, so we can't just
+// skip them — reads the popup's configurable "Leave Hours" (default 8:00)
+// to use as their value instead.
+function getLeaveDefault(callback) {
+  chrome.storage.local.get(SETTINGS_KEY, (result) => {
+    const settings = result[SETTINGS_KEY] || {};
+    const h = parseInt(settings.leaveH);
+    const m = parseInt(settings.leaveM);
+    const leaveH = Number.isNaN(h) ? 8 : h;
+    const leaveM = Number.isNaN(m) ? 0 : m;
+    callback(`${leaveH}:${String(leaveM).padStart(2, "0")}`);
+  });
+}
+
+function extractData(defaultTime) {
   const text = document.body.innerText;
   const lines = text.split("\n");
 
@@ -15,12 +31,15 @@ function extractData() {
        line.includes("Fri"))
     ) {
       const nextLine = lines[i + 1];
-      if (!nextLine) continue;
+      const match = nextLine ? nextLine.match(/(\d+)h\s*(\d+)m/) : null;
 
-      const match = nextLine.match(/(\d+)h\s*(\d+)m/);
-      if (!match) continue;
-
-      const formatted = `${match[1]}:${match[2].padStart(2, "0")}`;
+      // no parseable hours under this day (e.g. on leave) — resolve it to
+      // the leave default right away instead of skipping it, otherwise the
+      // backward scan keeps going and eventually matches last week's row
+      // for the same weekday, leaking stale data into this week's slot.
+      const formatted = match
+        ? `${match[1]}:${match[2].padStart(2, "0")}`
+        : defaultTime;
 
       if (line.includes("Mon") && !data.mon) data.mon = formatted;
       if (line.includes("Tue") && !data.tue) data.tue = formatted;
@@ -38,8 +57,8 @@ function extractData() {
   return data;
 }
 
-function extractAndStore() {
-  const data = extractData();
+function extractAndStore(defaultTime) {
+  const data = extractData(defaultTime);
   console.log("✅ Latest Week:", data);
 
   if (Object.values(data).some(v => v)) {
@@ -47,6 +66,13 @@ function extractAndStore() {
   }
 
   return data;
+}
+
+function runExtraction(callback) {
+  getLeaveDefault((defaultTime) => {
+    const data = extractAndStore(defaultTime);
+    if (callback) callback(data);
+  });
 }
 
 // Keka is a SPA — the hours table renders asynchronously, so wait for it to
@@ -57,12 +83,12 @@ function hasRenderedData() {
 }
 
 if (hasRenderedData()) {
-  extractAndStore();
+  runExtraction();
 } else {
   const observer = new MutationObserver(() => {
     if (hasRenderedData()) {
       observer.disconnect();
-      extractAndStore();
+      runExtraction();
     }
   });
   observer.observe(document.body, { childList: true, subtree: true, characterData: true });
@@ -74,7 +100,9 @@ if (hasRenderedData()) {
 // let the popup ask for a fresh scrape on demand (the "Fetch from Keka" button)
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "fetchNow") {
-    const data = extractAndStore();
-    sendResponse({ ok: Object.values(data).some(v => v), data });
+    runExtraction((data) => {
+      sendResponse({ ok: Object.values(data).some(v => v), data });
+    });
+    return true; // keep the message channel open for the async sendResponse
   }
 });
